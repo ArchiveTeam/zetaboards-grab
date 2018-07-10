@@ -14,9 +14,7 @@ local downloaded = {}
 local addedtolist = {}
 local abortgrab = false
 
-local domain = string.match(item_value, "^([^:]+)")
-local id = string.match(item_value, ":([^:]+):")
-local page = string.match(item_value, ":([^:]+)$")
+local domain, id = string.match(item_value, "^([^:]+):([^:]+):[^:]+$")
 
 for ignore in io.open("ignore-list", "r"):lines() do
   downloaded[ignore] = true
@@ -122,7 +120,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end
   end
   
-  if string.match(url, "/forum/" .. id .. "/" .. page .. "/$") then
+  if string.match(url, "/forum/" .. id .. "/") then
     html = read_file(file)
     for newurl in string.gmatch(html, '([^"]+)') do
       checknewurl(newurl)
@@ -176,7 +174,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:flush()
       tries = 0
       if allowed(url["url"], nil)
-          or string.match(url, "/forum/" .. id .. "/" .. page .. "/$")
+          or string.match(url["url"], "/forum/" .. id .. "/")
           or status_code == 500 then
         return wget.actions.ABORT
       else
