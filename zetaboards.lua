@@ -85,6 +85,12 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   
   local function check(urla)
     local origurl = url
+    if string.match(urla, "/topic/[0-9]+/[0-9]+/$") then
+      local main, pages = string.match(urla, "^(.+/topic/[0-9]+/)([0-9]+)/$")
+      for i=1,tonumber(pages) do
+        check(main .. tostring(i) .. "/#")
+      end
+    end
     local url = string.match(urla, "^([^#]+)")
     local url_ = string.gsub(url, "&amp;", "&")
     if (downloaded[url_] ~= true and addedtolist[url_] ~= true)
