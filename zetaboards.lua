@@ -14,7 +14,13 @@ local downloaded = {}
 local addedtolist = {}
 local abortgrab = false
 
-local domain, id = string.match(item_value, "^([^:]+):([^:]+):[^:]+$")
+local domain, id = string.match(string.lower(item_value), "^([^:]+):([^:]+):[^:]+$")
+
+local urlmatchinner = "[^/]+"
+for _ in string.gmatch(item_value, "(/).") do
+  urlmatchinner = urlmatchinner .. "/[^/]+"
+end
+local urlmatch = "^https?://(" .. urlmatchinner .. ")"
 
 for ignore in io.open("ignore-list", "r"):lines() do
   downloaded[ignore] = true
@@ -35,7 +41,7 @@ allowed = function(url, parenturl)
   if string.match(url, "'+")
       or string.match(url, "[<>\\%*%$;%^%[%],%(%)]")
       or string.match(url, "//$")
-      or string.match(url, "^https?://([^/]+)") ~= domain then
+      or string.match(string.lower(url), urlmatch) ~= domain then
     return false
   end
 
