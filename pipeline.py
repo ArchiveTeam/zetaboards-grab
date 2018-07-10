@@ -58,7 +58,7 @@ if not WGET_LUA:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20180710.02'
+VERSION = '20180710.04'
 USER_AGENT = 'ArchiveTeam'
 TRACKER_ID = 'zetaboards'
 TRACKER_HOST = 'tracker.archiveteam.org'
@@ -199,7 +199,7 @@ class WgetArgs(object):
             start, end = d[-1].split('-')
             for i in range(int(start), int(end)+1):
                 wget_args.append('http://{}/forum/{}/{}/'.format(d[0], d[1], i))
-                if d[-1] == '1':
+                if i == 1:
                     wget_args.append('http://{}/forum/{}/'.format(*d[0:2]))
         else:
             raise Exception('Unknown item')
