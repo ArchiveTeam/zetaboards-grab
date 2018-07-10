@@ -50,7 +50,8 @@ allowed = function(url, parenturl)
     tested[s] = tested[s] + 1
   end
 
-  if string.match(url, "/topic/") then
+  if string.match(url, "/topic/")
+      and string.match(parenturl, "/forum/" .. id .. "/") then
     return true
   end
 
@@ -173,7 +174,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:write("\nI give up...\n")
       io.stdout:flush()
       tries = 0
-      if allowed(url["url"], nil)
+      if allowed(url["url"], "/forum/" .. id .. "/")
           or string.match(url["url"], "/forum/" .. id .. "/")
           or status_code == 500 then
         return wget.actions.ABORT
