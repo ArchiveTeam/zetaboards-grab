@@ -15,6 +15,7 @@ local addedtolist = {}
 local abortgrab = false
 
 local domain, id = string.match(string.lower(item_value), "^([^:]+):([^:]+):[^:]+$")
+local url_counter = {}
 
 local urlmatchinner = "[^/]+"
 for _ in string.gmatch(item_value, "(/).") do
@@ -165,6 +166,14 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
 
+  if url_counter[url["url"]] == nil then
+    url_counter[url["url"]] = 0
+  end
+  if url_counter[url["url"]] == 9 then
+    return wget.actions.EXIT
+  end
+  url_counter[url["url"]] = url_counter[url["url"]] + 1
+
   if (status_code >= 200 and status_code <= 399) then
     downloaded[url["url"]] = true
     downloaded[string.gsub(url["url"], "https?://", "http://")] = true
@@ -187,8 +196,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:flush()
       tries = 0
       if allowed(url["url"], "/forum/" .. id .. "/")
-          or string.match(url["url"], "/forum/" .. id .. "/")
-          or status_code == 500 then
+          or string.match(url["url"], "/forum/" .. id .. "/") then
         return wget.actions.ABORT
       else
         return wget.actions.EXIT
