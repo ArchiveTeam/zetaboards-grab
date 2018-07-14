@@ -60,7 +60,7 @@ if not WGET_LUA:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20180713.01'
+VERSION = '20180714.01'
 USER_AGENT = 'ArchiveTeam'
 TRACKER_ID = 'zetaboards'
 TRACKER_HOST = 'tracker.archiveteam.org'
@@ -199,12 +199,16 @@ class WgetArgs(object):
         if item_type == 'forumpage':
             d = item_value.split(':')
             r = requests.get('http://' + d[0])
-            real = re.search('(' + re.escape(d[0]) + ')', r.url, re.I).group(1)
-            start, end = d[-1].split('-')
-            for i in range(int(start), int(end)+1):
-                wget_args.append('http://{}/forum/{}/{}/'.format(real, d[1], i))
-                if i == 1:
-                    wget_args.append('http://{}/forum/{}/'.format(real, d[1]))
+            find = re.search('(' + re.escape(d[0]) + ')', r.url, re.I)
+            if find is None and 'tapatalk' in r.url:
+                wget_args.append('http://' + d[0])
+            else:
+                real = find.group(1)
+                start, end = d[-1].split('-')
+                for i in range(int(start), int(end)+1):
+                    wget_args.append('http://{}/forum/{}/{}/'.format(real, d[1], i))
+                    if i == 1:
+                        wget_args.append('http://{}/forum/{}/'.format(real, d[1]))
         else:
             raise Exception('Unknown item')
 
